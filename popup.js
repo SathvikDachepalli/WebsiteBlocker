@@ -2,25 +2,15 @@ let sniffBtn = document.getElementById('sniffBtn');
 let website = document.getElementById('website');
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-
-  if (changeInfo.status === 'complete') {
+  if (changeInfo.status === 'complete' && tab.active) {
     website.innerHTML = tab.url;
-    sniff()
+    chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: sniff,
+      args: [tab.url]
+    });
   }
-  
 });
-
-sniffBtn.addEventListener('click', async () => {
-
-  let queryOptions = { active: true, lastFocusedWindow: true };
-  let [tab] = await chrome.tabs.query(queryOptions);
-  chrome.scripting.executeScript({
-    target: { tabId: tab.id },
-    func: sniff,
-    args: [tab.url]
-  });
-});
-
 
 function sniff(url){
   let Urls=["https://www.google.com/", "https://www.facebook.com/", "https://www.youtube.com/ ", "https://www.yahoo.com/" ];
