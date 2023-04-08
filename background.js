@@ -4,24 +4,43 @@ chrome.action.isEnabled(function (isEnabled) {
           chrome.scripting.executeScript({
             target: { tabId: tab.id },
             func: sniff,
-            args: [tab.url,tabId]
+            args: [tab.url]
           }).then((resp) => {
-            console.log(resp[0].result);
+            console.log("Blocked");
+            console.log(resp[0].result)
+              if(resp[0].result===true){
+                console.log(tabId);
+                chrome.tabs.create({
+                  url: "html/redirect.html",
+                  active: true,
+                });
+                chrome.tabs.remove(tab.id);
+              }
           });
         }
       });
 }
 );
 
-function sniff(url,tabId) {
+function sniff(url) {
   let flag=false;
-  const sites = ["www.qorno.com/*"];
+  const sites = ["www.qorno.com/*","www.hypnotube.com/*"];
   for(let i=0;i<sites.length;i++){
     if(url.match(sites[i])){
-      console.log("Matched");
       flag=true;
     }
   }
-  const words=[/xxx/gi,/porn/gi,/sex/gi]
-  
+  const words=[/porn/gi,/hentai/gi]
+  let getdata = document.querySelector('body').innerText
+  for(let i=0;i<words.length;i++){
+    if(getdata.match(words[i])){
+      flag=true;
+    }
+  }
+  if(flag){
+    return true;
+  }
+  else{
+    return false;
+  }
 }
